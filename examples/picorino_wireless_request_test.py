@@ -5,8 +5,8 @@ import time
 import picowireless as aa
 from micropython import const
 
-WIFI_SSID = "Mit_wifi"
-WIFI_PASS = "12345678"
+WIFI_SSID = "MyWifif"
+WIFI_PASS = "Password"
 
 CLOUDFLARE_DNS = (1, 1, 1, 1)
 GOOGLE_DNS = (8, 8, 8, 8)

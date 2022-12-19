@@ -1,12 +1,12 @@
 import time
-import picowireless as aa
+import picowireless as wireless
 from micropython import const
-import urequests_custom as ppp
+import urequests_custom as urequests
 
-WIFI_SSID = "reatuirytuy" #"Mit_wifi"
-WIFI_PASS = "lagkageidag" #"12345678"
+WIFI_SSID = "MyWifif"
+WIFI_PASS = "Password"
 
-picowireless = aa.PicoWireless()
+picowireless = wireless.PicoWireless()
 picowireless.wifi_set_passphrase(WIFI_SSID, WIFI_PASS)
 
 while True:
@@ -14,11 +14,6 @@ while True:
         break
 print("Connected!")
 
-obj={
-    "system": "trailerlog-display",
-    "action": "get-temperatures",
-    "token": "7XUWsJp0HqEzIHE76jPv6Hhw1eNed3EWl6Sb99kRb6NJWbqf5jKOiLy82xSfKcULNQpfPCYINNsGeelxTUFJca7BE6XyaVtUxqHGNSBHr3jNHPopZDnNAAo7aj2hOjM5p7Y4yTrZLQlwJL3qwUbnAwjctXlAWbBrzViKx96bciTqsacQ4TNx43FiUJm3oadUJAF53RnRzffIa99vOOgNv85lJoHu6bfCuaqzoHD27KO9VtqnKc6VCrjDilyWGldh",
-    "trailer_id": 159
-}
-ff=ppp.get(picowireless, "http://app.trailerlog.com/app/api.php", json=obj)
-print(ff.text)
+ff=urequests.get(picowireless, "https://reqres.in/api/users?page=2")
+print(ff.json())
+ff.close()

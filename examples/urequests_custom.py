@@ -1,21 +1,22 @@
-#import usocket
-import esp_socket as usocket
+from picowireless import PicoWireless
+from esp_socket import SOCKET_MODE
 from urlparse import urlencode
-import ure
-import time
+import esp_socket as usocket
+import ujson
+
 
 class Response:
-    def __init__(self, f):
+    def __init__(self, f: usocket.socket):
         self.raw = f
         self.encoding = "utf-8"
         self._cached = None
-        self.status_code = None
-        self.reason = None
-        self.headers = None
+        self.status_code = 204
+        self.reason = "No Content"
+        self.headers = {}
         # cookie support as dict
-        self.cookies = None
+        self.cookies = {}
         # url to see redirect targets
-        self.url = None
+        self.url = ""
 
     def close(self):
         if self.raw:
@@ -26,6 +27,8 @@ class Response:
     @property
     def content(self):
         if self._cached is None:
+            if (self.raw is None):
+                return b''
             try:
                 if ("Content-Length" in self.headers and self.headers["Content-Length"].isdigit()):
                     self._cached = self.raw.read(int(self.headers["Content-Length"]))
@@ -36,70 +39,81 @@ class Response:
                 self.raw = None
         return self._cached
 
-    # extracts data from a stream, if the direct conversion of the result to a string consumes too much memory
-    def extract(self, _startStr, _endStr):
-        # we prepare an array to store
-        results = []
-        # prepare regex to reduces spaces to on space
-        # and remove cr/linefeeds
-        removeWhiteSpaces = ure.compile("(  )+")
-        removeCR = ure.compile("[\r\n]")
-        endOfStream = False
-        _startStrBytes = bytes(_startStr, 'utf-8')
-        _endStrBytes = bytes(_endStr, 'utf-8')
-        # start with mininum length of the search String
-        # if it is smaller than the start - end
-        pageStreamBytes = self.raw.read(len(_startStr))
-        if len(pageStreamBytes) < len(_startStr):
-            endOfStream = True
-        # we must convert the searchstring to bytes als not for all charcters uft-8 encoding is working
-        # like in Curacao (special c)
-        while not endOfStream:
-            if pageStreamBytes == _startStrBytes:
-                # we found a matching string
-                # print('Start found %s ' % pageStreamBytes.decode('utf-8'))
-                # we need to find the end
-                endOfTag = False
-                read = self.raw.read(len(_endStr))
-                if len(read) == 0:
-                    endOfStream = True
-                pageStreamBytes += read
-                while ((not endOfStream) and (not endOfTag)):
-                    # comparing the string with the find method is easier
-                    # than comparing the bytes
-                    if (pageStreamBytes.decode('utf-8')).find(_endStr) > 0:
-                        endOfTag = True
-                        result = removeWhiteSpaces.sub('', pageStreamBytes.decode('utf-8'))
-                        result = removeCR.sub('', result)
-                        results.append(result)
-                        # print('Result: %s' % result)
-                    else:
-                        # read and Append
-                        read = self.raw.read(1)
-                        if len(read) == 0:
-                            endOfStream = True
-                        else:
-                            pageStreamBytes += read
-                            # print('End not Found %s' % pageStreamBytes.decode('utf-8'))
-            else:
-                # we did not find a matching string
-                # and reduce by one character before we add the next
-                # print('not found %s' % pageStream)
-                pageStreamBytes = pageStreamBytes[1:len(_startStrBytes)]
-            read = self.raw.read(1)
-            if len(read) == 0:
-                endOfStream = True
-            pageStreamBytes = pageStreamBytes + read
-        self.close()
-        return results
+# region Depricated
+    # # extracts data from a stream, if the direct conversion of the result to a string consumes too much memory
+    # def extract(self, _startStr, _endStr):
+    #     # we prepare an array to store
+    #     results = []
+    #     if (self.raw == None):
+    #         return results
+    #     # prepare regex to reduces spaces to on space
+    #     # and remove cr/linefeeds
+    #     removeWhiteSpaces = ure.compile("(  )+")
+    #     removeCR = ure.compile("[\r\n]")
+    #     endOfStream = False
+    #     _startStrBytes = bytes(_startStr, 'utf-8')
+    #     _endStrBytes = bytes(_endStr, 'utf-8')
+    #     # start with mininum length of the search String
+    #     # if it is smaller than the start - end
+    #     pageStreamBytes = self.raw.read(len(_startStr))
+    #     if len(pageStreamBytes) < len(_startStr):
+    #         endOfStream = True
+    #     # we must convert the searchstring to bytes als not for all charcters uft-8 encoding is working
+    #     # like in Curacao (special c)
+    #     while not endOfStream:
+    #         if pageStreamBytes == _startStrBytes:
+    #             # we found a matching string
+    #             # print('Start found %s ' % pageStreamBytes.decode('utf-8'))
+    #             # we need to find the end
+    #             endOfTag = False
+    #             read = self.raw.read(len(_endStr))
+    #             if len(read) == 0:
+    #                 endOfStream = True
+    #             pageStreamBytes += read
+    #             while ((not endOfStream) and (not endOfTag)):
+    #                 # comparing the string with the find method is easier
+    #                 # than comparing the bytes
+    #                 if (pageStreamBytes.decode('utf-8')).find(_endStr) > 0:
+    #                     endOfTag = True
+    #                     result = removeWhiteSpaces.sub('', pageStreamBytes.decode('utf-8'))
+    #                     result = removeCR.sub('', result)
+    #                     results.append(result)
+    #                     # print('Result: %s' % result)
+    #                 else:
+    #                     # read and Append
+    #                     read = self.raw.read(1)
+    #                     if len(read) == 0:
+    #                         endOfStream = True
+    #                     else:
+    #                         pageStreamBytes += read
+    #                         # print('End not Found %s' % pageStreamBytes.decode('utf-8'))
+    #         else:
+    #             # we did not find a matching string
+    #             # and reduce by one character before we add the next
+    #             # print('not found %s' % pageStream)
+    #             pageStreamBytes = pageStreamBytes[1:len(_startStrBytes)]
+    #         read = self.raw.read(1)
+    #         if len(read) == 0:
+    #             endOfStream = True
+    #         pageStreamBytes = pageStreamBytes + read
+    #     self.close()
+    #     return results
+# endregion
 
     @property
     def text(self):
-        return str(self.content, self.encoding)
+        try:
+            return str(self.content, self.encoding)
+        except:
+            self.close()
+            return ""
 
     def json(self):
-        import ujson
-        return ujson.loads(self.content)
+        try:
+            return ujson.loads(self.text)
+        except:
+            self.close()
+            return {}
 
 """ method = head, get, put, patch, post, delete
 url (with our without parameters)
@@ -108,7 +122,8 @@ if cookies are supplied, new cookies will be added
 if parse_headers is false -> no cookies are returned as they are part of the header
 if followRedirect = false -> the redirect URL is stored in URL
 """
-def request(picowireless, method, url, params=None, cookies=None, data=None, json=None, headers={}, timeout=30.0, parse_headers=True, followRedirect=True):
+def request(picowireless, method, url, params=None, cookies={}, data=None, json=None, headers={}, timeout=30.0, parse_headers=True, followRedirect=True):
+    # type: (PicoWireless, str, str, dict|None, dict, str|None, dict|None, dict, float, bool, bool) -> Response
     if params is not None:
         if params != {}:
             url = url.rstrip('?') + '?' + urlencode(params, doseq=True)
@@ -122,7 +137,6 @@ def request(picowireless, method, url, params=None, cookies=None, data=None, jso
         if proto == "http:":
             port = 80
         elif proto == "https:":
-            import ussl
             port = 443
         else:
             raise ValueError("Unsupported protocol: " + proto)
@@ -131,12 +145,14 @@ def request(picowireless, method, url, params=None, cookies=None, data=None, jso
             host, port = host.split(":", 1)
             port = int(port)
 
-        ai = usocket.getaddrinfo(host, port, 0, usocket.SOCK_STREAM)
+        ai = usocket.getaddrinfo(picowireless, host, port, 0, usocket.SOCK_STREAM)
         ai = ai[0]
+        
+        if (ai is None):
+            print("Unable to get IP")
+            raise
 
-        resp_d = None
-        if parse_headers is not False:
-            resp_d = {}
+        resp_d = {}
 
         # print('Socket create')
         s = usocket.socket(ai[0], ai[1], ai[2], picowireless)
@@ -145,9 +161,12 @@ def request(picowireless, method, url, params=None, cookies=None, data=None, jso
 
         try:
             # print('Socket connect')
-            s.connect(ai[-1])
-            if proto == "https:":
-                s = ussl.wrap_socket(s, server_hostname=host)
+            if (proto == "https:"):
+                s.connect((host, port), SOCKET_MODE.TLS)
+            else:
+                s.connect(ai[-1])
+            #if proto == "https:":
+            #    s = ussl.wrap_socket(s, server_hostname=host)
             # print('Socket wrapped')
             s.write(b"%s /%s HTTP/1.0\r\n" % (method, path))
             # print('Socket write: ')
@@ -161,7 +180,7 @@ def request(picowireless, method, url, params=None, cookies=None, data=None, jso
                 s.write(headers[k])
                 s.write(b"\r\n")
                 # print(k, b": ".decode('utf-8'), headers[k], b"\r\n".decode('utf-8'))
-            if cookies is not None:
+            if (cookies):
                 for cookie in cookies:
                     s.write(b"Cookie: ")
                     s.write(cookie)
@@ -170,7 +189,6 @@ def request(picowireless, method, url, params=None, cookies=None, data=None, jso
                     s.write(b"\r\n")
             if json is not None:
                 assert data is None
-                import ujson
                 data = ujson.dumps(json)
                 s.write(b"Content-Type: application/json\r\n")
             if data:
@@ -180,14 +198,19 @@ def request(picowireless, method, url, params=None, cookies=None, data=None, jso
             if data:
                 s.write(data)
                 # print(data)
+
+            # region Get response (IE. "HTTP/1.1 200 OK")
             # TODO: Had an issue, where this returned a NoneType, so the .split crashed.
-            l = s.readline()
-            print('Received protocoll and resultcode %s' % l.decode('utf-8'))
+            l = s.readline().decode('utf-8')
+            print('Received protocoll and resultcode %s' % l)
             l = l.split(None, 2)
             status = int(l[1])
-            reason = ""
             if len(l) > 2:
-                reason = l[2].rstrip()                
+                reason = l[2].rstrip()
+            else:
+                reason = ""
+            # endregion  
+
             # Loop to read header data
             while True:
                 l = s.readline()
@@ -216,8 +239,6 @@ def request(picowireless, method, url, params=None, cookies=None, data=None, jso
                     # adding cookie support (cookies are overwritten as they have the same key in dict)
                     # supplied in the request, not supported is the domain attribute of cookies, this is not set
                     # new cookies are added to the supplied cookies
-                    if cookies is None:
-                        cookies = {}
                     if k == 'Set-Cookie':
                         ck, cv = v.split("=", 1)
                         cookies[ck.strip()] = cv.strip()
@@ -225,43 +246,52 @@ def request(picowireless, method, url, params=None, cookies=None, data=None, jso
                     else:
                         resp_d[k] = v.strip()
                 else:
+                    # In case "parse_headers" is a function, then call it.
                     parse_headers(l, resp_d)
         except OSError:
             s.close()
             print('Socket closed')
             raise
         # if redirect repeat else leave loop
-        if status != 302:
+        if (status != 302):
             break
         # if redirect false leave loop
-        if (status == 302) and not followRedirect:
+        if ((status == 302) and not followRedirect):
             break
         # if 302 and redirect = true then loop
+
+    # Generate the response
     resp = Response(s)
     resp.url = url
     resp.status_code = status
     resp.reason = reason
-    if resp_d is not None:
-        resp.headers = resp_d
+    resp.headers = resp_d
     # adding cookie support
     resp.cookies = cookies
     return resp
 
-def head(url, **kw):
-    return request("HEAD", url, **kw)
+
+
+def head(picowireless, url, **kw):
+    # type: (PicoWireless, str, ...) -> Response
+    return request(picowireless, "HEAD", url, **kw)
 
 def get(picowireless, url, **kw):
+    # type: (PicoWireless, str, ...) -> Response
     return request(picowireless, "GET", url, **kw)
 
-def post(url, **kw):
-    return request("POST", url, **kw)
+def post(picowireless, url, **kw):
+    # type: (PicoWireless, str, ...) -> Response
+    return request(picowireless, "POST", url, **kw)
 
-def put(url, **kw):
-    return request("PUT", url, **kw)
+def put(picowireless, url, **kw):
+    # type: (PicoWireless, str, ...) -> Response
+    return request(picowireless, "PUT", url, **kw)
 
-def patch(url, **kw):
-    return request("PATCH", url, **kw)
+def patch(picowireless, url, **kw):
+    # type: (PicoWireless, str, ...) -> Response
+    return request(picowireless, "PATCH", url, **kw)
 
-def delete(url, **kw):
-    return request("DELETE", url, **kw)
-
+def delete(picowireless, url, **kw):
+    # type: (PicoWireless, str, ...) -> Response
+    return request(picowireless, "DELETE", url, **kw)
