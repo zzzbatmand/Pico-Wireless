@@ -75,10 +75,10 @@ enum wl_error_code_t {
 
 enum sv_protocol_mode {
     TCP_MODE,
-    UDP_MODE
+    UDP_MODE,
+    TLS_MODE
     
     // TODO: All other modes are depricated in NINA_Simple
-    // TLS_MODE,
     // UDP_MULTICAST_MODE,
     // TLS_BEARSSL_MODE
 };
