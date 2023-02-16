@@ -5,6 +5,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /***** Module Functions *****/
+MP_DEFINE_CONST_FUN_OBJ_1(PicoWireless_reset_obj, PicoWireless_reset);
+
 MP_DEFINE_CONST_FUN_OBJ_1(PicoWireless_get_network_data_obj, PicoWireless_get_network_data);
 MP_DEFINE_CONST_FUN_OBJ_KW(PicoWireless_get_remote_data_obj, 2, PicoWireless_get_remote_data);
 
@@ -85,6 +87,8 @@ MP_DEFINE_CONST_FUN_OBJ_1(PicoWireless_wifi_set_ent_enable_obj, PicoWireless_wif
 
 /***** Locals Table *****/
 STATIC const mp_rom_map_elem_t PicoWireless_locals_dict_table[] = {
+    { MP_ROM_QSTR(MP_QSTR_reset), MP_ROM_PTR(&PicoWireless_reset_obj) },
+
     { MP_ROM_QSTR(MP_QSTR_get_network_data), MP_ROM_PTR(&PicoWireless_get_network_data_obj) },
     { MP_ROM_QSTR(MP_QSTR_get_remote_data), MP_ROM_PTR(&PicoWireless_get_remote_data_obj) },
     { MP_ROM_QSTR(MP_QSTR_wifi_set_network), MP_ROM_PTR(&PicoWireless_wifi_set_network_obj) },

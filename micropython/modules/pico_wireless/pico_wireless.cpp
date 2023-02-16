@@ -108,6 +108,12 @@ mp_obj_t PicoWireless_make_new(const mp_obj_type_t *type, size_t n_args, size_t 
     return MP_OBJ_FROM_PTR(self);
 }
 
+mp_obj_t PicoWireless_reset(mp_obj_t self_in) {
+    picowireless_obj_t *self = MP_OBJ_TO_PTR2(self_in, picowireless_obj_t);
+
+    return mp_obj_new_bool(self->wireless->reset());
+}
+
 mp_obj_t PicoWireless_get_network_data(mp_obj_t self_in) {
     picowireless_obj_t *self = MP_OBJ_TO_PTR2(self_in, picowireless_obj_t);
 

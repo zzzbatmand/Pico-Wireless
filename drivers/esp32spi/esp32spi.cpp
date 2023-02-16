@@ -95,6 +95,11 @@ namespace pimoroni {
 
     return true;
   }
+  
+  bool Esp32Spi::reset() {
+    // Reset chip and return.
+    return driver.reset();
+  }
 
   bool Esp32Spi::get_network_data(uint8_t *ip_out, uint8_t *mask_out, uint8_t *gwip_out) {
     SpiDrv::outParam params_out[SpiDrv::PARAM_NUMS_3] = { {0, ip_out},

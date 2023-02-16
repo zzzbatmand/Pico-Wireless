@@ -178,7 +178,7 @@ namespace pimoroni {
   public:
     void init();
     void init(uint8_t acs, uint8_t asck, uint8_t amosi, uint8_t amiso, uint8_t aresetn, uint8_t agpio0, uint8_t aack);
-    void reset();
+    bool reset();
     
     bool available();
 

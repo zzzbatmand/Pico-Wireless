@@ -131,6 +131,7 @@ namespace pimoroni {
   public:
     virtual bool init();
     virtual bool init(uint8_t cs, uint8_t sck, uint8_t mosi, uint8_t miso, uint8_t resetn, uint8_t gpio0, uint8_t ack);
+    virtual bool reset();
 
     //--------------------------------------------------
     //From https://github.com/adafruit/WiFiNINA/blob/master/src/utility/wifi_drv.cpp

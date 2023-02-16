@@ -18,6 +18,8 @@ namespace pimoroni {
 
     gpio_init(resetn);
     gpio_set_dir(resetn, GPIO_OUT);
+    // Reset is active-low, so we'll initialise it to a driven-high state
+    gpio_put(resetn, true);
   }
   
   void SpiDrv::init(uint8_t acs, uint8_t asck, uint8_t amosi, uint8_t amiso, uint8_t aresetn, uint8_t agpio0, uint8_t aack) {
@@ -44,15 +46,25 @@ namespace pimoroni {
 
     gpio_init(resetn);
     gpio_set_dir(resetn, GPIO_OUT);
+    // Reset is active-low, so we'll initialise it to a driven-high state
+    gpio_put(resetn, true);
   }
 
-  void SpiDrv::reset() {
+  bool SpiDrv::reset() {
+    bool isLow = false;
+    
     gpio_put(gpio0, true);
     gpio_put(cs, true);
     gpio_put(resetn, false);
     sleep_ms(10);
+    
+    // Check that the pin was pulled low. Had issues with this.
+    isLow = !gpio_get(resetn);
+    
     gpio_put(resetn, true);
     sleep_ms(750);
+    
+    return isLow;
   }
 
   bool SpiDrv::available() {
