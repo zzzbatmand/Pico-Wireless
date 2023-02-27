@@ -80,10 +80,10 @@ MP_DEFINE_CONST_FUN_OBJ_KW(PicoWireless_send_data_obj, 3, PicoWireless_send_data
 MP_DEFINE_CONST_FUN_OBJ_KW(PicoWireless_check_data_sent_obj, 2, PicoWireless_check_data_sent);
 MP_DEFINE_CONST_FUN_OBJ_1(PicoWireless_get_socket_obj, PicoWireless_get_socket);
 
-MP_DEFINE_CONST_FUN_OBJ_KW(PicoWireless_wifi_set_ent_identity_obj, 2, PicoWireless_wifi_set_ent_identity);
-MP_DEFINE_CONST_FUN_OBJ_KW(PicoWireless_wifi_set_ent_username_obj, 2, PicoWireless_wifi_set_ent_username);
-MP_DEFINE_CONST_FUN_OBJ_KW(PicoWireless_wifi_set_ent_password_obj, 2, PicoWireless_wifi_set_ent_password);
-MP_DEFINE_CONST_FUN_OBJ_1(PicoWireless_wifi_set_ent_enable_obj, PicoWireless_wifi_set_ent_enable);
+// MP_DEFINE_CONST_FUN_OBJ_KW(PicoWireless_wifi_set_ent_identity_obj, 2, PicoWireless_wifi_set_ent_identity);
+// MP_DEFINE_CONST_FUN_OBJ_KW(PicoWireless_wifi_set_ent_username_obj, 2, PicoWireless_wifi_set_ent_username);
+// MP_DEFINE_CONST_FUN_OBJ_KW(PicoWireless_wifi_set_ent_password_obj, 2, PicoWireless_wifi_set_ent_password);
+// MP_DEFINE_CONST_FUN_OBJ_1(PicoWireless_wifi_set_ent_enable_obj, PicoWireless_wifi_set_ent_enable);
 
 /***** Locals Table *****/
 STATIC const mp_rom_map_elem_t PicoWireless_locals_dict_table[] = {
@@ -155,10 +155,10 @@ STATIC const mp_rom_map_elem_t PicoWireless_locals_dict_table[] = {
     { MP_ROM_QSTR(MP_QSTR_check_data_sent), MP_ROM_PTR(&PicoWireless_check_data_sent_obj) },
     { MP_ROM_QSTR(MP_QSTR_get_socket), MP_ROM_PTR(&PicoWireless_get_socket_obj) },
 
-    { MP_ROM_QSTR(MP_QSTR_wifi_set_ent_identity), MP_ROM_PTR(&PicoWireless_wifi_set_ent_identity_obj) },
-    { MP_ROM_QSTR(MP_QSTR_wifi_set_ent_username), MP_ROM_PTR(&PicoWireless_wifi_set_ent_username_obj) },
-    { MP_ROM_QSTR(MP_QSTR_wifi_set_ent_password), MP_ROM_PTR(&PicoWireless_wifi_set_ent_password_obj) },
-    { MP_ROM_QSTR(MP_QSTR_wifi_set_ent_enable), MP_ROM_PTR(&PicoWireless_wifi_set_ent_enable_obj) },
+    // { MP_ROM_QSTR(MP_QSTR_wifi_set_ent_identity), MP_ROM_PTR(&PicoWireless_wifi_set_ent_identity_obj) },
+    // { MP_ROM_QSTR(MP_QSTR_wifi_set_ent_username), MP_ROM_PTR(&PicoWireless_wifi_set_ent_username_obj) },
+    // { MP_ROM_QSTR(MP_QSTR_wifi_set_ent_password), MP_ROM_PTR(&PicoWireless_wifi_set_ent_password_obj) },
+    // { MP_ROM_QSTR(MP_QSTR_wifi_set_ent_enable), MP_ROM_PTR(&PicoWireless_wifi_set_ent_enable_obj) },
 };
 STATIC MP_DEFINE_CONST_DICT(PicoWireless_locals_dict, PicoWireless_locals_dict_table);
 
