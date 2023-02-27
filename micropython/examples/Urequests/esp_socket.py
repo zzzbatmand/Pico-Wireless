@@ -3,19 +3,31 @@ import time
 
 SOCK_STREAM = 1
 
+class connection_status():
+    WL_NO_SHIELD        = 255,
+    WL_IDLE_STATUS      = 0,
+    WL_NO_SSID_AVAIL    = 1,
+    WL_SCAN_COMPLETED   = 2,
+    WL_CONNECTED        = 3,
+    WL_CONNECT_FAILED   = 4,
+    WL_CONNECTION_LOST  = 5,
+    WL_DISCONNECTED     = 6
+
 class SOCKET_MODE():
     TCP = 0
     UDP = 1
     TLS = 2
 
-def getaddrinfo(picowireless, host: str, port, _x, _y):
+def getaddrinfo(picowireless, host: str, port, _x=None, _y=None):
     if (picowireless.req_host_by_name(host)):
         ip=picowireless.get_host_by_name()
+        # TODO: Does the first variables mean anything? If so, fix them.
         return [(2, 1, 0, '', (ip, port))]
     
     return [None]
 
 
+# TODO: Remove all the unused variables.
 class socket:
     def __init__(self, _x, _y, _z, picowireless: PicoWireless):
         # TODO: make use of client number from esp
@@ -30,7 +42,7 @@ class socket:
     def connect(self, host: tuple, mode = SOCKET_MODE.TCP):
         url=host[0]
         port=host[1]
-        print(url)
+        #print(url)
         if (port == 443):
             self.picowireless.client_start((0,0,0,0), port, self.client, mode, url)
         else:
@@ -49,8 +61,8 @@ class socket:
         return False
     
     def write(self, dat: str|bytes):
-        print(dat)
-        self.picowireless.send_data(self.client, dat)
+        #print(dat)
+        return self.picowireless.send_data(self.client, dat)
         
     def readline(self):
         if (len(self.res) == 0):
@@ -87,7 +99,7 @@ class socket:
         
     def __read(self, count) -> bytes:
         t_start = time.time()
-        print(self.timeout)
+        #print(self.timeout)
         while True:
             if time.time() - t_start > self.timeout:
                 self.picowireless.client_stop(self.client)
@@ -98,7 +110,7 @@ class socket:
             if (avail_length > 0 or count):
                 break
 
-        print("Got response: {} bytes".format(avail_length))
+        #print("Got response: {} bytes".format(avail_length))
 
         response = b""
 

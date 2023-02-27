@@ -1,2 +1,2 @@
-WIFI_SSID = "SSID"
-WIFI_PASS = "PASS"
+WIFI_SSID = "reatuirytuy"
+WIFI_PASS = "lagkageidag"
