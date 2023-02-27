@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "vector": "cpp",
+        "xstring": "cpp",
+        "xutility": "cpp",
+        "algorithm": "cpp",
+        "xhash": "cpp",
+        "xtree": "cpp",
+        "memory": "cpp"
+    }
+}
