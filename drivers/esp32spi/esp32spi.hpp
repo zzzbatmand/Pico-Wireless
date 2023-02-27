@@ -95,6 +95,7 @@ namespace pimoroni {
     // Constants
     //--------------------------------------------------
   public:
+    // NOTE: ESP32
     // static const uint8_t INPUT = 0;
     // static const uint8_t OUTPUT = 1;
     // static const uint8_t INPUT_PULLUP = 2;

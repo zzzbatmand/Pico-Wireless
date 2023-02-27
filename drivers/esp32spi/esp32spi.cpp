@@ -469,7 +469,7 @@ namespace pimoroni {
   }
 
   int16_t Esp32Spi::ping(uint32_t ip_address, uint8_t count) {
-    // Ping a remote address. count ammount of times
+    // Ping a remote address. n ammount of times
     // See: https://github.com/adafruit/nina-fw/blob/104c48cb48e2a04c8a8009ef2db1b551414628a5/main/CommandHandler.cpp#L919-L935
     SpiDrv::inParam params[] = {
       SpiDrv::build_param(&ip_address),

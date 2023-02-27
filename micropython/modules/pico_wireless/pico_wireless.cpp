@@ -342,12 +342,12 @@ mp_obj_t PicoWireless_get_current_encryption_type(mp_obj_t self_in) {
     return mp_obj_new_int(self->wireless->get_current_encryption_type());
 }
 
-// TODO: Why is this even here?
-mp_obj_t PicoWireless_start_scan_networks(mp_obj_t self_in) {
-    // This doesn't actually *do* anything, so might as well save a few instructions!
-    
-    return mp_const_true;
-}
+// DEPRICATED
+// mp_obj_t PicoWireless_start_scan_networks(mp_obj_t self_in) {
+//     // This doesn't actually *do* anything, so might as well save a few instructions!
+//
+//     return mp_const_true;
+// }
 
 mp_obj_t PicoWireless_get_scan_networks(mp_obj_t self_in) {
     picowireless_obj_t *self = MP_OBJ_TO_PTR2(self_in, picowireless_obj_t);
@@ -697,41 +697,20 @@ mp_obj_t PicoWireless_digital_read(size_t n_args, const mp_obj_t *pos_args, mp_m
 }
 
 mp_obj_t PicoWireless_analog_read(size_t n_args, const mp_obj_t *pos_args, mp_map_t *kw_args) {
-    if(n_args == 2) {
-        enum { ARG_self, ARG_pin };
-        static const mp_arg_t allowed_args[] = {
-            { MP_QSTR_self, MP_ARG_REQUIRED | MP_ARG_OBJ },
-            { MP_QSTR_esp_pin, MP_ARG_REQUIRED | MP_ARG_INT },
-        };
+    enum { ARG_self, ARG_pin };
+    static const mp_arg_t allowed_args[] = {
+        { MP_QSTR_self, MP_ARG_REQUIRED | MP_ARG_OBJ },
+        { MP_QSTR_esp_pin, MP_ARG_REQUIRED | MP_ARG_INT },
+    };
 
-        mp_arg_val_t args[MP_ARRAY_SIZE(allowed_args)];
-        mp_arg_parse_all(n_args, pos_args, kw_args, MP_ARRAY_SIZE(allowed_args), allowed_args, args);
+    mp_arg_val_t args[MP_ARRAY_SIZE(allowed_args)];
+    mp_arg_parse_all(n_args, pos_args, kw_args, MP_ARRAY_SIZE(allowed_args), allowed_args, args);
 
-        picowireless_obj_t *self = MP_OBJ_TO_PTR2(args[ARG_self].u_obj, picowireless_obj_t);
+    picowireless_obj_t *self = MP_OBJ_TO_PTR2(args[ARG_self].u_obj, picowireless_obj_t);
 
-        uint8_t pin = args[ARG_pin].u_int;
-        return mp_obj_new_int(self->wireless->analog_read(pin) * 16); //Returns a 16 bit-ish* number as per CircuitPython
-    }
-    else {
-        enum { ARG_self, ARG_pin, ARG_atten };
-        static const mp_arg_t allowed_args[] = {
-            { MP_QSTR_self, MP_ARG_REQUIRED | MP_ARG_OBJ },
-            { MP_QSTR_esp_pin, MP_ARG_REQUIRED | MP_ARG_INT },
-            { MP_QSTR_atten, MP_ARG_REQUIRED | MP_ARG_INT },
-        };
-
-        mp_arg_val_t args[MP_ARRAY_SIZE(allowed_args)];
-        mp_arg_parse_all(n_args, pos_args, kw_args, MP_ARRAY_SIZE(allowed_args), allowed_args, args);
-
-        picowireless_obj_t *self = MP_OBJ_TO_PTR2(args[ARG_self].u_obj, picowireless_obj_t);
-
-        uint8_t pin = args[ARG_pin].u_int;
-        uint8_t atten = args[ARG_atten].u_int;
-        return mp_obj_new_int(self->wireless->analog_read(pin, atten) * 16); //Returns a 16 bit-ish* number as per CircuitPython
-    }
+    uint8_t pin = args[ARG_pin].u_int;
+    return mp_obj_new_int(self->wireless->analog_read(pin) * 16); // Returns as a 16 bit-ish* number as per micropython
     //NOTE *better way would be to mult by 65535 then div by 4095
-    
-    return mp_const_none;
 }
 
 mp_obj_t PicoWireless_server_start(size_t n_args, const mp_obj_t *pos_args, mp_map_t *kw_args) {
@@ -1033,68 +1012,70 @@ mp_obj_t PicoWireless_get_socket(mp_obj_t self_in) {
     return mp_obj_new_int(self->wireless->get_socket());
 }
 
-mp_obj_t PicoWireless_wifi_set_ent_identity(size_t n_args, const mp_obj_t *pos_args, mp_map_t *kw_args) {
-    enum { ARG_self, ARG_identity };
-    static const mp_arg_t allowed_args[] = {
-        { MP_QSTR_self, MP_ARG_REQUIRED | MP_ARG_OBJ },
-        { MP_QSTR_identity, MP_ARG_REQUIRED | MP_ARG_OBJ },
-    };
+/* #region DEPRICATED */
+// mp_obj_t PicoWireless_wifi_set_ent_identity(size_t n_args, const mp_obj_t *pos_args, mp_map_t *kw_args) {
+//     enum { ARG_self, ARG_identity };
+//     static const mp_arg_t allowed_args[] = {
+//         { MP_QSTR_self, MP_ARG_REQUIRED | MP_ARG_OBJ },
+//         { MP_QSTR_identity, MP_ARG_REQUIRED | MP_ARG_OBJ },
+//     };
 
-    mp_arg_val_t args[MP_ARRAY_SIZE(allowed_args)];
-    mp_arg_parse_all(n_args, pos_args, kw_args, MP_ARRAY_SIZE(allowed_args), allowed_args, args);
+//     mp_arg_val_t args[MP_ARRAY_SIZE(allowed_args)];
+//     mp_arg_parse_all(n_args, pos_args, kw_args, MP_ARRAY_SIZE(allowed_args), allowed_args, args);
 
-    picowireless_obj_t *self = MP_OBJ_TO_PTR2(args[ARG_self].u_obj, picowireless_obj_t);
+//     picowireless_obj_t *self = MP_OBJ_TO_PTR2(args[ARG_self].u_obj, picowireless_obj_t);
 
-    std::string identity;
-    mp_obj_to_string(args[ARG_identity].u_obj, identity);
-    self->wireless->wifi_set_ent_identity(identity);
+//     std::string identity;
+//     mp_obj_to_string(args[ARG_identity].u_obj, identity);
+//     self->wireless->wifi_set_ent_identity(identity);
+
+//     return mp_const_none;
+// }
+
+// mp_obj_t PicoWireless_wifi_set_ent_username(size_t n_args, const mp_obj_t *pos_args, mp_map_t *kw_args) {
+//     enum { ARG_self, ARG_username };
+//     static const mp_arg_t allowed_args[] = {
+//         { MP_QSTR_self, MP_ARG_REQUIRED | MP_ARG_OBJ },
+//         { MP_QSTR_username, MP_ARG_REQUIRED | MP_ARG_OBJ },
+//     };
+
+//     mp_arg_val_t args[MP_ARRAY_SIZE(allowed_args)];
+//     mp_arg_parse_all(n_args, pos_args, kw_args, MP_ARRAY_SIZE(allowed_args), allowed_args, args);
+
+//     picowireless_obj_t *self = MP_OBJ_TO_PTR2(args[ARG_self].u_obj, picowireless_obj_t);
+
+//     std::string username;
+//     mp_obj_to_string(args[ARG_username].u_obj, username);
+//     self->wireless->wifi_set_ent_username(username);
     
-    return mp_const_none;
-}
+//     return mp_const_none;
+// }
 
-mp_obj_t PicoWireless_wifi_set_ent_username(size_t n_args, const mp_obj_t *pos_args, mp_map_t *kw_args) {
-    enum { ARG_self, ARG_username };
-    static const mp_arg_t allowed_args[] = {
-        { MP_QSTR_self, MP_ARG_REQUIRED | MP_ARG_OBJ },
-        { MP_QSTR_username, MP_ARG_REQUIRED | MP_ARG_OBJ },
-    };
+// mp_obj_t PicoWireless_wifi_set_ent_password(size_t n_args, const mp_obj_t *pos_args, mp_map_t *kw_args) {
+//     enum { ARG_self, ARG_password };
+//     static const mp_arg_t allowed_args[] = {
+//         { MP_QSTR_self, MP_ARG_REQUIRED | MP_ARG_OBJ },
+//         { MP_QSTR_password, MP_ARG_REQUIRED | MP_ARG_OBJ },
+//     };
 
-    mp_arg_val_t args[MP_ARRAY_SIZE(allowed_args)];
-    mp_arg_parse_all(n_args, pos_args, kw_args, MP_ARRAY_SIZE(allowed_args), allowed_args, args);
+//     mp_arg_val_t args[MP_ARRAY_SIZE(allowed_args)];
+//     mp_arg_parse_all(n_args, pos_args, kw_args, MP_ARRAY_SIZE(allowed_args), allowed_args, args);
 
-    picowireless_obj_t *self = MP_OBJ_TO_PTR2(args[ARG_self].u_obj, picowireless_obj_t);
+//     picowireless_obj_t *self = MP_OBJ_TO_PTR2(args[ARG_self].u_obj, picowireless_obj_t);
 
-    std::string username;
-    mp_obj_to_string(args[ARG_username].u_obj, username);
-    self->wireless->wifi_set_ent_username(username);
-    
-    return mp_const_none;
-}
+//     std::string password;
+//     mp_obj_to_string(args[ARG_password].u_obj, password);
+//     self->wireless->wifi_set_ent_password(password);
 
-mp_obj_t PicoWireless_wifi_set_ent_password(size_t n_args, const mp_obj_t *pos_args, mp_map_t *kw_args) {
-    enum { ARG_self, ARG_password };
-    static const mp_arg_t allowed_args[] = {
-        { MP_QSTR_self, MP_ARG_REQUIRED | MP_ARG_OBJ },
-        { MP_QSTR_password, MP_ARG_REQUIRED | MP_ARG_OBJ },
-    };
+//     return mp_const_none;
+// }
 
-    mp_arg_val_t args[MP_ARRAY_SIZE(allowed_args)];
-    mp_arg_parse_all(n_args, pos_args, kw_args, MP_ARRAY_SIZE(allowed_args), allowed_args, args);
+// mp_obj_t PicoWireless_wifi_set_ent_enable(mp_obj_t self_in) {
+//     picowireless_obj_t *self = MP_OBJ_TO_PTR2(self_in, picowireless_obj_t);
 
-    picowireless_obj_t *self = MP_OBJ_TO_PTR2(args[ARG_self].u_obj, picowireless_obj_t);
+//     self->wireless->wifi_set_ent_enable();
 
-    std::string password;
-    mp_obj_to_string(args[ARG_password].u_obj, password);
-    self->wireless->wifi_set_ent_password(password);
-    
-    return mp_const_none;
-}
-
-mp_obj_t PicoWireless_wifi_set_ent_enable(mp_obj_t self_in) {
-    picowireless_obj_t *self = MP_OBJ_TO_PTR2(self_in, picowireless_obj_t);
-
-    self->wireless->wifi_set_ent_enable();
-    
-    return mp_const_none;
-}
+//     return mp_const_none;
+// }
+/* #endregion */
 }
